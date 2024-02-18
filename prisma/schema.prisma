@@ -21,6 +21,8 @@ model User {
     firstName String?
     lastName  String?
 
+    refreshToken String?
+
     bookmark Bookmark[]
 
     @@map("users")
