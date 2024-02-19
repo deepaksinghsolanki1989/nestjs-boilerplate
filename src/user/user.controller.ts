@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { AccessTokenGuard } from '@/auth/guard';
 import { GetUser } from '@/auth/decorator';
+import { AccessTokenGuard } from '@/auth/guard';
 
 @UseGuards(AccessTokenGuard)
 @Controller('users')
