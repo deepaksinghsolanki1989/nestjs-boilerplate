@@ -23,22 +23,5 @@ model User {
 
     refreshToken String?
 
-    bookmark Bookmark[]
-
     @@map("users")
-}
-
-model Bookmark {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    title       String
-    description String?
-    link        String
-
-    userId String @db.ObjectId
-    user   User   @relation(fields: [userId], references: [id])
-
-    @@map("bookmarks")
 }
