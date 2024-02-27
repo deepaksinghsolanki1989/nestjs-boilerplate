@@ -10,13 +10,15 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { AuthDto } from './dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { User } from '@prisma/client';
+import { EmailService } from '@/email/email.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
-    private jwt: JwtService,
     private config: ConfigService,
+    private email: EmailService,
+    private jwt: JwtService,
+    private prisma: PrismaService,
   ) {}
 
   async signup(dto: AuthDto) {
@@ -24,13 +26,22 @@ export class AuthService {
       // Generate the password hash
       const hash = await this.hashData(dto.password);
 
+      const buffer = await argon.hash(Date.now().toString(), {
+        raw: true,
+      });
+
+      const emailToken = buffer.toString('hex');
+
       // Save the new user in the database
       const user = await this.prisma.user.create({
         data: {
           email: dto.email,
           password: hash,
+          emailToken,
         },
       });
+
+      await this.email.signUp(emailToken, dto.email);
 
       const tokens = await this.getTokens(user.id, user.email);
       await this.updateRefreshToken(user.id, tokens.refresh_token);
@@ -94,6 +105,33 @@ export class AuthService {
     await this.updateRefreshToken(user.id, tokens.refresh_token);
 
     return tokens;
+  }
+
+  async verifyEmail(token: string) {
+    // Find the user by email
+    const user = await this.prisma.user.findFirst({
+      select: {
+        id: true,
+      },
+      where: {
+        emailToken: token,
+      },
+    });
+
+    // If user does not exist throw exception
+    if (!user) {
+      throw new ForbiddenException('Unable to verify email');
+    }
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        emailToken: '',
+        isEmailVerified: true,
+      },
+    });
+
+    return { message: 'Email verified successfully' };
   }
 
   hashData(data: string) {

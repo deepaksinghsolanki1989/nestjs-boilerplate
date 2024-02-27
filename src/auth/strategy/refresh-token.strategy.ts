@@ -24,12 +24,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
       where: { id: payload.sub },
       select: {
         id: true,
-        createdAt: true,
-        updatedAt: true,
         email: true,
-        password: false,
-        firstName: true,
-        lastName: true,
         refreshToken: true,
       },
     });

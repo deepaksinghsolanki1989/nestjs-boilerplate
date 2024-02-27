@@ -24,7 +24,7 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
         createdAt: true,
         updatedAt: true,
         email: true,
-        password: false,
+        password: true,
         firstName: true,
         lastName: true,
         refreshToken: false,

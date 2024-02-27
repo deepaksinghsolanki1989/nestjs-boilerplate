@@ -1,5 +1,5 @@
+import { Match } from '@/decorator';
 import {
-  IsEmail,
   IsNotEmpty,
   IsString,
   Matches,
@@ -7,10 +7,10 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class AuthDto {
-  @IsEmail()
+export class ChangePasswordDto {
+  @IsString()
   @IsNotEmpty()
-  email: string;
+  currentPassword: string;
 
   @IsString()
   @IsNotEmpty()
@@ -19,5 +19,11 @@ export class AuthDto {
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message: 'password too weak',
   })
-  password: string;
+  newPassword: string;
+
+  @IsString()
+  @MinLength(4)
+  @MaxLength(20)
+  @Match<ChangePasswordDto>('newPassword')
+  confirmPassword: string;
 }

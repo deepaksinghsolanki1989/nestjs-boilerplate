@@ -35,7 +35,7 @@ export class AuthController {
   }
 
   @UseGuards(RefreshTokenGuard)
-  @Get('refresh')
+  @Get('refresh-token')
   refreshTokens(
     @GetUser() user: User,
     @GetHeaders('authorization') refreshToken: string,
